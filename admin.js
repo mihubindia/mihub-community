@@ -207,13 +207,9 @@ if (loginForm) {
     }
 
     const button =
-      loginForm.querySelector(
-        'button[type="submit"]'
-      );
+      loginForm.querySelector('button[type="submit"]');
 
-    const originalText = button
-      ? button.textContent
-      : "";
+    const originalText = button ? button.textContent : "";
 
     if (button) {
       button.disabled = true;
@@ -221,65 +217,33 @@ if (loginForm) {
     }
 
     try {
-      const data = await fetch(
-        `${API_BASE_URL}/admin/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            email,
-            password
-          })
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/admin/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
 
-      const result = await data.json();
+      const result = await response.json();
 
-      if (!data.ok) {
+      if (!response.ok) {
         throw new Error(
-          result.message ||
-            "Invalid admin credentials."
+          result.message || "Invalid admin credentials."
         );
       }
 
-      if (result.requiresOtp) {
-        otpRequestId =
-          result.otpRequestId || null;
-
-        if (!otpRequestId) {
-          throw new Error(
-            "OTP request ID was not received from the server."
-          );
-        }
-
-        openOtpScreen();
-
-        otpMessage.textContent =
-          result.message ||
-          "A verification OTP has been sent to your email.";
-
-        showToast(
-          "OTP sent successfully."
-        );
-
-        return;
-      }
-
-      if (result.authenticated && result.token) {
+      if (result.success && result.authenticated && result.token) {
         enterDashboard(
-          result.admin || {
-            email
-          },
+          result.admin || { email },
           result.token
         );
-
         return;
       }
 
-      loginMessage.textContent =
-        "Administrator authentication failed.";
+      throw new Error(
+        result.message || "Administrator authentication failed."
+      );
     } catch (error) {
       loginMessage.textContent =
         error.message ||
