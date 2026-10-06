@@ -467,68 +467,59 @@ app.get("/api/jobs/status", (req, res) => {
     }
 });
 
-app.post("/api/admin/login", async (req, res) => {
+app.post("/api/admin/login", (req, res) => {
     try {
         const email = String(req.body?.email || "").trim();
         const password = String(req.body?.password || "");
-        if (!email || !password) return res.status(400).json({ success: false, message: "Email and password are required" });
-        if (!ADMIN_PASSWORD) return res.status(500).json({ success: false, message: "Admin password is not configured on the server" });
 
-        const validEmail = email.toLowerCase() === String(ADMIN_EMAIL).toLowerCase();
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password are required"
+            });
+        }
+
+        if (!ADMIN_PASSWORD) {
+            return res.status(500).json({
+                success: false,
+                message: "Admin password is not configured on the server"
+            });
+        }
+
+        const validEmail =
+            email.toLowerCase() === String(ADMIN_EMAIL).toLowerCase();
         const validPassword = safeCompare(password, ADMIN_PASSWORD);
-        if (!validEmail || !validPassword) return res.status(401).json({ success: false, message: "Invalid admin credentials" });
-        if (!SMTP_PASS) return res.status(500).json({ success: false, message: "Email service is not configured" });
 
-        for (const [requestId, pending] of pendingOtps.entries()) {
-            if (pending.email.toLowerCase() === email.toLowerCase()) pendingOtps.delete(requestId);
+        if (!validEmail || !validPassword) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid admin credentials"
+            });
         }
 
-        const otpRequestId = createToken();
-        const otp = generateOtp();
-        pendingOtps.set(otpRequestId, { email: ADMIN_EMAIL, otpHash: hashOtp(otp), expiresAt: Date.now() + OTP_EXPIRY_MS, attempts: 0 });
-
-        try {
-            await sendAdminOtpEmail(ADMIN_EMAIL, otp);
-        } catch (emailError) {
-            pendingOtps.delete(otpRequestId);
-            console.error("Admin OTP email failed:", emailError.message);
-            return res.status(500).json({ success: false, message: "Failed to send OTP email" });
-        }
-
-        return res.json({ success: true, requiresOtp: true, otpRequestId, requestId: otpRequestId, message: `OTP has been sent to ${ADMIN_EMAIL}` });
-    } catch {
-        return res.status(500).json({ success: false, message: "Admin login failed" });
-    }
-});
-
-app.post("/api/admin/verify-otp", (req, res) => {
-    try {
-        const otpRequestId = req.body?.otpRequestId || req.body?.requestId || req.body?.verificationId;
-        const otp = req.body?.otp || req.body?.code;
-        if (!otpRequestId || !otp) return res.status(400).json({ success: false, message: "OTP request ID and OTP are required" });
-
-        const pending = pendingOtps.get(otpRequestId);
-        if (!pending) return res.status(401).json({ success: false, message: "Invalid or expired OTP request" });
-        if (Date.now() > pending.expiresAt) {
-            pendingOtps.delete(otpRequestId);
-            return res.status(401).json({ success: false, message: "OTP expired" });
-        }
-        if (pending.attempts >= MAX_OTP_ATTEMPTS) {
-            pendingOtps.delete(otpRequestId);
-            return res.status(429).json({ success: false, message: "Too many incorrect OTP attempts. Please request a new OTP." });
-        }
-
-        pending.attempts += 1;
-        if (!safeCompare(hashOtp(String(otp)), pending.otpHash)) {
-            return res.status(401).json({ success: false, message: `Invalid OTP. ${MAX_OTP_ATTEMPTS - pending.attempts} attempts remaining.` });
-        }
-
-        pendingOtps.delete(otpRequestId);
         const token = createToken();
-        sessions.set(token, { email: pending.email, createdAt: Date.now(), expiresAt: Date.now() + SESSION_EXPIRY_MS });
-        return res.json({ success: true, message: "Admin login successful", token, admin: { email: pending.email } });
-    } catch {
-        return res.status(500).json({ success: false, message: "OTP verification failed" });
+
+        sessions.set(token, {
+            email: ADMIN_EMAIL,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + SESSION_EXPIRY_MS
+        });
+
+        return res.json({
+            success: true,
+            authenticated: true,
+            message: "Admin login successful",
+            token,
+            admin: {
+                email: ADMIN_EMAIL
+            }
+        });
+    } catch (error) {
+        console.error("Admin login failed:", error.message);
+        return res.status(500).json({
+            success: false,
+            message: "Admin login failed"
+        });
     }
 });
 
