@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#020b1c">
+  <title>Admin | Mewar Innovators Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<div class="bg-effects">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+
+    <div class="security-badge">
+      <i class="fa-solid fa-shield-halved"></i>
+      Secure Admin Portal
+    </div>
+
+    <div class="admin-logo">
+      <img src="assets/mi-hub-logo.png" alt="Mewar Innovators Hub">
+    </div>
+
+    <h1>Admin Access</h1>
+
+    <p class="login-subtitle">
+      Authorized personnel only. Verify your identity to continue.
+    </p>
+
+    <form id="loginForm">
+
+      <label>
+        Admin Email
+        <div class="input-wrap">
+          <i class="fa-solid fa-envelope"></i>
+          <input
+            type="email"
+            id="adminEmail"
+            autocomplete="username"
+            placeholder="admin@mewarinnovatorshub.com"
+            required
+          >
+        </div>
+      </label>
+
+      <label>
+        Password
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input
+            type="password"
+            id="adminPassword"
+            autocomplete="current-password"
+            placeholder="Enter admin password"
+            required
+          >
+          <button type="button" id="togglePassword">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+      </label>
+
+      <div class="verification-row">
+        <div class="verification-icon">
+          <i class="fa-solid fa-fingerprint"></i>
+        </div>
+
+        <div>
+          <strong>High Verification Required</strong>
+          <span>Identity verification will be required.</span>
+        </div>
+      </div>
+
+      <div id="loginMessage" class="login-message"></div>
+
+      <button class="login-btn" type="submit">
+        <span>Verify & Continue</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+
+    </form>
+
+    <div class="login-footer">
+      <i class="fa-solid fa-lock"></i>
+      Protected MI Hub administration area
+    </div>
+
+  </div>
+</div>
+
+<div class="otp-screen hidden" id="otpScreen">
+  <div class="otp-card">
+
+    <div class="otp-icon">
+      <i class="fa-solid fa-shield-halved"></i>
+    </div>
+
+    <h2>Identity Verification</h2>
+
+    <p>
+      Enter the verification code sent to your registered admin account.
+    </p>
+
+    <div class="otp-inputs">
+      <input maxlength="1" inputmode="numeric">
+      <input maxlength="1" inputmode="numeric">
+      <input maxlength="1" inputmode="numeric">
+      <input maxlength="1" inputmode="numeric">
+      <input maxlength="1" inputmode="numeric">
+      <input maxlength="1" inputmode="numeric">
+    </div>
+
+    <div id="otpMessage" class="login-message"></div>
+
+    <button class="login-btn" id="verifyOtp">
+      Verify Identity
+      <i class="fa-solid fa-check"></i>
+    </button>
+
+    <button class="back-login" id="backLogin">
+      Back to login
+    </button>
+
+  </div>
+</div>
+
+<div class="dashboard hidden" id="dashboard">
+
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-brand">
+      <img src="assets/mi-hub-logo.png" alt="MI Hub">
+      <div>
+        <strong>Mewar Innovators Hub</strong>
+        <span>ADMIN PANEL</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <button class="nav-item active" data-page="overview">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Overview</span>
+      </button>
+
+      <button class="nav-item" data-page="community">
+        <i class="fa-solid fa-users"></i>
+        <span>Community Joining</span>
+        <b id="communityCount">0</b>
+      </button>
+
+      <button class="nav-item" data-page="jobs">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>Job Applications</span>
+        <b id="jobCount">0</b>
+      </button>
+
+      <button class="nav-item" data-page="approved">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Approved</span>
+      </button>
+
+      <button class="nav-item" data-page="offers">
+        <i class="fa-solid fa-file-signature"></i>
+        <span>Offer Letters</span>
+      </button>
+
+      <button class="nav-item" data-page="verification">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Verification</span>
+      </button>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+      <div class="admin-profile">
+        <div class="profile-avatar">Admin</div>
+        <div>
+          <strong id="adminName">Administrator</strong>
+          <span>Verified Admin</span>
+        </div>
+      </div>
+
+      <button class="logout-btn" id="logoutBtn">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout
+      </button>
+
+    </div>
+
+  </aside>
+
+  <div class="main-area">
+
+    <header class="topbar">
+
+      <button class="mobile-sidebar-btn" id="mobileSidebarBtn">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <div class="page-heading">
+        <span>MI HUB ADMINISTRATION</span>
+        <h1 id="pageTitle">Dashboard Overview</h1>
+      </div>
+
+      <div class="topbar-actions">
+
+        <div class="secure-status">
+          <span></span>
+          Secure Session
+        </div>
+
+        <button class="icon-btn" id="refreshBtn" title="Refresh">
+          <i class="fa-solid fa-rotate"></i>
+        </button>
+
+      </div>
+
+    </header>
+
+    <main class="content">
+
+      <section class="page active" id="overviewPage">
+
+        <div class="welcome-card">
+          <div>
+            <span class="eyebrow">ADMIN CONTROL CENTER</span>
+
+            <h2>Welcome back, Administrator.</h2>
+
+            <p>
+              Manage MI Hub community members, job applications, approvals, verification documents and offer letters from one secure workspace.
+            </p>
+          </div>
+
+          <div class="welcome-orb">
+            <img src="assets/mi-hub-logo.png" alt="MI Hub">
+          </div>
+        </div>
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <span>Total Community</span>
+            <strong id="totalCommunity">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon orange">
+              <i class="fa-solid fa-briefcase"></i>
+            </div>
+            <span>Job Applications</span>
+            <strong id="totalJobs">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <span>Approved</span>
+            <strong id="totalApproved">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon gold">
+              <i class="fa-solid fa-file-signature"></i>
+            </div>
+            <span>Offer Letters</span>
+            <strong id="totalOffers">0</strong>
+          </div>
+
+        </div>
+
+        <div class="dashboard-grid">
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Recent Applications</h3>
+                <p>Latest activity from applicants</p>
+              </div>
+
+              <button class="text-btn" data-page-link="jobs">
+                View All
+              </button>
+            </div>
+
+            <div id="recentApplications" class="recent-list"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>System Security</h3>
+                <p>Current administrator session</p>
+              </div>
+            </div>
+
+            <div class="security-list">
+
+              <div>
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Admin authentication</span>
+                <b>Active</b>
+              </div>
+
+              <div>
+                <i class="fa-solid fa-key"></i>
+                <span>Identity verification</span>
+                <b>Enabled</b>
+              </div>
+
+              <div>
+                <i class="fa-solid fa-clock"></i>
+                <span>Session protection</span>
+                <b>Active</b>
+              </div>
+
+              <div>
+                <i class="fa-solid fa-database"></i>
+                <span>Data management</span>
+                <b>Protected</b>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="page" id="communityPage">
+
+        <div class="section-toolbar">
+
+          <div>
+            <h2>Community Joining</h2>
+            <p>Manage students and community members.</p>
+          </div>
+
+          <div class="toolbar-actions">
+            <input id="communitySearch" placeholder="Search members...">
+
+            <button class="icon-btn" id="communityRefresh">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
+          </div>
+
+        </div>
+
+        <div class="table-panel">
+
+          <div class="table-scroll">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Email</th>
+                  <th>Education</th>
+                  <th>Domain</th>
+                  <th>Joined</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody id="communityTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="page" id="jobsPage">
+
+        <div class="section-toolbar">
+
+          <div>
+            <h2>Job Applications</h2>
+            <p>Review, approve and manage job applicants.</p>
+          </div>
+
+          <div class="toolbar-actions">
+
+            <input id="jobSearch" placeholder="Search applications...">
+
+            <select id="jobFilter">
+              <option value="all">All</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+
+          </div>
+
+        </div>
+
+        <div class="table-panel">
+
+          <div class="table-scroll">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Applicant</th>
+                  <th>Education</th>
+                  <th>Availability</th>
+                  <th>Applied</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody id="jobTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="page" id="approvedPage">
+
+        <div class="section-toolbar">
+
+          <div>
+            <h2>Approved Candidates</h2>
+            <p>Applicants approved for opportunities.</p>
+          </div>
+
+        </div>
+
+        <div class="approved-grid" id="approvedGrid"></div>
+
+      </section>
+
+      <section class="page" id="offersPage">
+
+        <div class="section-toolbar">
+
+          <div>
+            <h2>Offer Letters</h2>
+            <p>Create and manage candidate offer letters.</p>
+          </div>
+
+        </div>
+
+        <div class="offer-grid" id="offerGrid"></div>
+
+      </section>
+
+      <section class="page" id="verificationPage">
+
+        <div class="section-toolbar">
+
+          <div>
+            <h2>Document Verification</h2>
+            <p>Add official PNG or PDF documents for candidate verification.</p>
+          </div>
+
+        </div>
+
+        <div class="panel verification-panel">
+
+          <div class="panel-head">
+
+            <div>
+              <h3>Add Verification Document</h3>
+              <p>Enter the Offer ID and Application ID and upload the official document.</p>
+            </div>
+
+          </div>
+
+          <form id="verificationForm" enctype="multipart/form-data">
+
+            <div class="grid-two">
+
+              <label>
+                Offer ID
+                <input
+                  type="text"
+                  id="verificationOfferId"
+                  name="offerId"
+                  placeholder="MIH-OFF-2026-M4"
+                  autocomplete="off"
+                  required
+                >
+              </label>
+
+              <label>
+                Application ID
+                <input
+                  type="text"
+                  id="verificationApplicationId"
+                  name="applicationId"
+                  placeholder="MIH-APP-2026-M4"
+                  autocomplete="off"
+                  required
+                >
+              </label>
+
+            </div>
+
+            <label>
+              Official Document
+              <input
+                type="file"
+                id="verificationDocument"
+                name="document"
+                accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf"
+                required
+              >
+              <small>Supported formats: PNG, JPG, JPEG and PDF. Maximum 10 MB.</small>
+            </label>
+
+            <div class="verification-file-preview" id="verificationFilePreview"></div>
+
+            <div id="verificationMessage" class="form-message"></div>
+
+            <button
+              class="btn primary full-btn"
+              type="submit"
+              id="saveVerificationBtn"
+            >
+              Save Verification Document
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </button>
+
+          </form>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="panel-head">
+
+            <div>
+              <h3>Verification Records</h3>
+              <p>Saved official documents available for public verification.</p>
+            </div>
+
+            <button class="icon-btn" id="verificationRefresh" title="Refresh">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
+
+          </div>
+
+          <div class="verification-grid" id="verificationGrid"></div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+</div>
+
+<div class="drawer hidden" id="detailsDrawer">
+
+  <div class="drawer-card">
+
+    <button class="drawer-close" id="drawerClose">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <div id="drawerContent"></div>
+
+  </div>
+
+</div>
+
+<div class="modal hidden" id="offerModal">
+
+  <div class="offer-modal">
+
+    <button class="modal-close" id="offerModalClose">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <div class="modal-heading">
+      <span class="eyebrow">MI HUB • OFFER LETTER</span>
+
+      <h2>Create Offer Letter</h2>
+
+      <p>
+        Generate an official offer letter for the approved candidate.
+      </p>
+    </div>
+
+    <form id="offerForm">
+
+      <input type="hidden" id="offerCandidateId">
+
+      <label>
+        Candidate Name
+        <input id="offerCandidateName" readonly>
+      </label>
+
+      <label>
+        Candidate Email
+        <input id="offerCandidateEmail" readonly>
+      </label>
+
+      <div class="grid-two">
+
+        <label>
+          Position / Role *
+          <input
+            id="offerRole"
+            required
+            placeholder="Software Developer Intern"
+          >
+        </label>
+
+        <label>
+          Department
+          <input
+            id="offerDepartment"
+            placeholder="Technology"
+          >
+        </label>
+
+        <label>
+          Joining Date *
+          <input
+            type="date"
+            id="offerJoiningDate"
+            required
+          >
+        </label>
+
+        <label>
+          Work Type
+          <select id="offerWorkType">
+            <option value="Remote">Remote</option>
+            <option value="Hybrid">Hybrid</option>
+            <option value="On-site">On-site</option>
+          </select>
+        </label>
+
+        <label>
+          Duration
+          <input
+            id="offerDuration"
+            placeholder="3 Months"
+          >
+        </label>
+
+        <label>
+          Stipend / Compensation
+          <input
+            id="offerCompensation"
+            placeholder="₹10,000 / month"
+          >
+        </label>
+
+      </div>
+
+      <label>
+        Additional Terms
+        <textarea
+          id="offerTerms"
+          rows="4"
+          placeholder="Additional terms or instructions"
+        ></textarea>
+      </label>
+
+      <button class="btn primary full-btn" type="submit">
+        Generate Offer Letter
+        <i class="fa-solid fa-file-signature"></i>
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<script src="admin.js"></script>
+
+</body>
+</html>

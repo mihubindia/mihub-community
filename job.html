@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Join MI Hub | Mewar Innovators Hub</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+  >
+
+  <link rel="stylesheet" href="job.css">
+</head>
+
+<body>
+
+  <div class="liquid-bg">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="particles">
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+  </div>
+
+  <header class="site-header">
+
+    <a href="index.html" class="brand">
+
+      <div class="brand-logo">
+        <img
+          src="assets/mi-hub-logo.png"
+          alt="Mewar Innovators Hub Logo"
+        >
+      </div>
+
+      <div class="brand-name">
+        <strong>Mewar</strong>
+        <span>Innovators Hub</span>
+      </div>
+
+    </a>
+
+    <a href="status.html" class="header-btn">
+      Check Status
+      <i class="fa-solid fa-arrow-up-right-from-square"></i>
+    </a>
+
+  </header>
+
+  <main>
+
+    <section class="hero container">
+
+      <div class="hero-content">
+
+        <div class="eyebrow">
+          <span></span>
+          MI HUB • CAREERS & OPPORTUNITIES
+        </div>
+
+        <h1>
+          Build Your Future
+          <span>with MI Hub.</span>
+        </h1>
+
+        <p>
+          Apply for internships, projects, part-time roles and
+          full-time opportunities with Mewar Innovators Hub.
+        </p>
+
+        <div class="hero-actions">
+
+          <a class="btn primary" href="#application">
+            Apply Now
+            <span>↗</span>
+          </a>
+
+          <a class="btn secondary" href="status.html">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Check Status
+          </a>
+
+        </div>
+
+      </div>
+
+      <div class="hero-card glass">
+
+        <div class="card-glow"></div>
+
+        <div class="hero-logo">
+          <img
+            src="assets/mi-hub-logo.png"
+            alt="Mewar Innovators Hub"
+          >
+        </div>
+
+        <div class="hero-orbit orbit-one"></div>
+        <div class="hero-orbit orbit-two"></div>
+
+        <h3>One profile. Multiple opportunities.</h3>
+
+        <p>
+          Tell us about your education, skills, projects and
+          career interests so our team can understand where
+          you can contribute.
+        </p>
+
+        <div class="hero-tags">
+          <span>Internships</span>
+          <span>Hackathons</span>
+          <span>Jobs</span>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section id="application" class="container application-wrap">
+
+      <form id="applicationForm" novalidate>
+
+        <div class="section-card glass reveal">
+
+          <div class="section-head">
+            <span>01</span>
+
+            <div>
+              <h2>Personal Information</h2>
+              <p>Basic details and professional profiles.</p>
+            </div>
+          </div>
+
+          <div class="grid">
+
+            <label>
+              Full Name *
+              <input
+                required
+                name="fullName"
+                id="fullName"
+                autocomplete="name"
+              >
+            </label>
+
+            <label>
+              Email Address *
+              <input
+                required
+                type="email"
+                name="email"
+                id="email"
+                autocomplete="email"
+              >
+            </label>
+
+            <label>
+              Mobile Number *
+              <input
+                required
+                name="phone"
+                id="phone"
+                inputmode="tel"
+                autocomplete="tel"
+              >
+            </label>
+
+            <label>
+              Date of Birth
+              <input type="date" name="dateOfBirth">
+            </label>
+
+            <label>
+              Gender
+              <select name="gender">
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Non-binary</option>
+                <option>Prefer not to say</option>
+              </select>
+            </label>
+
+            <label>
+              City *
+              <input required name="city">
+            </label>
+
+            <label>
+              State *
+              <input required name="state" value="Rajasthan">
+            </label>
+
+            <label>
+              Country *
+              <input required name="country" value="India">
+            </label>
+
+          </div>
+
+          <label>
+            Address
+            <textarea name="address" rows="2"></textarea>
+          </label>
+
+          <div class="grid">
+
+            <label>
+              LinkedIn Profile
+              <input
+                type="url"
+                name="linkedin"
+                placeholder="https://linkedin.com/in/..."
+              >
+            </label>
+
+            <label>
+              GitHub Profile
+              <input
+                type="url"
+                name="github"
+                placeholder="https://github.com/..."
+              >
+            </label>
+
+            <label>
+              Portfolio Website
+              <input
+                type="url"
+                name="portfolio"
+                placeholder="https://..."
+              >
+            </label>
+
+            <label>
+              Profile Photo
+              <input
+                type="file"
+                id="profilePhoto"
+                accept="image/*"
+              >
+              <small>Optional. JPG/PNG/WebP recommended.</small>
+            </label>
+
+          </div>
+
+        </div>
+
+        <div class="section-card glass reveal">
+
+          <div class="section-head">
+            <span>02</span>
+
+            <div>
+              <h2>Secondary Education (10th)</h2>
+              <p>School-level academic details.</p>
+            </div>
+          </div>
+
+          <div class="grid">
+
+            <label>
+              Board *
+              <input required name="tenBoard">
+            </label>
+
+            <label>
+              Passing Year *
+              <input
+                required
+                type="number"
+                min="1950"
+                max="2100"
+                name="tenYear"
+              >
+            </label>
+
+            <label>
+              Percentage / CGPA *
+              <input required name="tenScore">
+            </label>
+
+          </div>
+
+        </div>
+
+        <div class="section-card glass reveal">
+
+          <div class="section-head">
+            <span>03</span>
+
+            <div>
+              <h2>Senior Secondary Education (12th)</h2>
+              <p>Higher-secondary academic details.</p>
+            </div>
+          </div>
+
+          <div class="grid">
+
+            <label>
+              Board *
+              <input required name="twelveBoard">
+            </label>
+
+            <label>
+              Stream *
+              <input
+                required
+                name="twelveStream"
+                placeholder="Science / Commerce / Arts"
+              >
+            </label>
+
+            <label>
+              Passing Year *
+              <input
+                required
+                type="number"
+                min="1950"
+                max="2100"
+                name="twelveYear"
+              >
+            </label>
+
+            <label>
+              Percentage / CGPA *
+              <input required name="twelveScore">
+            </label>
+
+          </div>
+
+        </div>
+
+        <div class="section-card glass reveal">
+
+          <div class="section-head">
+            <span>04</span>
+
+            <div>
+              <h2>Graduation Details</h2>
+              <p>Current or completed graduation information.</p>
+            </div>
+          </div>
+
+          <div class="grid">
+
+            <label>
+              College / University Name *
+              <input required name="university">
+            </label>
+
+            <label>
+              Degree *
+              <input
+                required
+                name="degree"
+                placeholder="BCA / B.Tech / B.Sc..."
+              >
+            </label>
+
+            <label>
+              Branch
+              <input name="specialization">
+            </label>
+
+            <label>
+              Current Semester & Year
+              <input
+                name="currentYear"
+                placeholder="2nd Year / 3rd Semester"
+              >
+            </label>
+
+            <label>
+              Expected Graduation Year
+              <input
+                type="number"
+                min="1950"
+                max="2100"
+                name="expectedGraduationYear"
+              >
+            </label>
+
+            <label>
+              Current / Final CGPA
+              <input name="cgpa">
+            </label>
+
+          </div>
+
+        </div>
+
+        <div class="section-card glass reveal">
+
+          <div class="section-head">
+            <span>08</span>
+
+            <div>
+              <h2>Availability</h2>
+              <p>Tell us how and when you can work.</p>
+            </div>
+          </div>
+
+          <div class="toggle-grid">
+
+            <label class="toggle">
+              <input
+                type="checkbox"
+                name="internship"
+              >
+              <span>Internship</span>
+            </label>
+
+            <label class="toggle">
+              <input
+                type="checkbox"
+                name="fullTime"
+              >
+              <span>Full-Time</span>
+            </label>
+
+            <label class="toggle">
+              <input
+                type="checkbox"
+                name="partTime"
+              >
+              <span>Part-Time</span>
+            </label>
+
+            <label class="toggle">
+              <input
+                type="checkbox"
+                name="remote"
+              >
+              <span>Remote</span>
+            </label>
+
+            <label class="toggle">
+              <input
+                type="checkbox"
+                name="hybrid"
+              >
+              <span>Hybrid</span>
+            </label>
+
+            <label class="toggle">
+              <input
+                type="checkbox"
+                name="onsite"
+              >
+              <span>On-site</span>
+            </label>
+
+          </div>
+
+          <div class="grid">
+
+            <label>
+              Available From
+              <input
+                type="date"
+                name="availableFrom"
+              >
+            </label>
+
+            <label>
+              Preferred Duration
+              <input
+                name="duration"
+                placeholder="e.g. 3 months / Permanent"
+              >
+            </label>
+
+          </div>
+
+        </div>
+
+        <div class="section-card glass reveal">
+
+          <div class="section-head">
+            <span>09</span>
+
+            <div>
+              <h2>Resume</h2>
+              <p>PDF, DOC or DOCX. Maximum 5 MB.</p>
+            </div>
+          </div>
+
+          <label class="upload">
+
+            <input
+              type="file"
+              id="resume"
+              accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            >
+
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+
+            <span id="resumeText">
+              Choose resume
+            </span>
+
+          </label>
+
+          <div
+            id="resumePreview"
+            class="file-preview hidden"
+          ></div>
+
+        </div>
+
+        <div class="section-card glass declaration">
+
+          <label class="check">
+
+            <input
+              required
+              type="checkbox"
+              name="declaration"
+            >
+
+            <span>
+              I confirm that the information provided by me is true and correct.
+            </span>
+
+          </label>
+
+          <div
+            id="formMessage"
+            class="form-message"
+          ></div>
+
+          <button
+            class="btn primary submit-btn"
+            type="submit"
+            id="submitApplication"
+          >
+            Submit Application
+            <span>→</span>
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+  </main>
+
+  <div
+    id="successModal"
+    class="modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="successTitle"
+  >
+
+    <div class="success glass">
+
+      <div class="success-icon">
+        <i class="fa-solid fa-check"></i>
+      </div>
+
+      <div class="success-logo">
+        <img
+          src="assets/mi-hub-logo.png"
+          alt="Mewar Innovators Hub"
+        >
+      </div>
+
+      <h2 id="successTitle">
+        Application Submitted Successfully
+      </h2>
+
+      <p>
+        Thank you for applying to Mewar Innovators Hub.
+        Your job application has been successfully received
+        and our team will review it soon.
+      </p>
+
+      <div class="success-id">
+
+        <span>
+          <i class="fa-solid fa-id-card"></i>
+          Application ID
+        </span>
+
+        <strong id="successId"></strong>
+
+        <small>
+          Please keep this Application ID safe for future reference.
+        </small>
+
+      </div>
+
+      <div class="success-info">
+
+        <div>
+          <i class="fa-solid fa-envelope"></i>
+          <span>
+            Confirmation email will be sent to your registered email address.
+          </span>
+        </div>
+
+        <div>
+          <i class="fa-solid fa-clock"></i>
+          <span>
+            You can use your Application ID to check your application status.
+          </span>
+        </div>
+
+      </div>
+
+      <p
+        class="muted"
+        id="successDate"
+      ></p>
+
+      <div class="success-actions">
+
+        <a
+          class="btn secondary"
+          href="status.html"
+        >
+          <i class="fa-solid fa-magnifying-glass"></i>
+          Check Status
+        </a>
+
+        <button
+          class="btn primary"
+          id="closeSuccess"
+          type="button"
+        >
+          Done
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer class="site-footer">
+
+    <div class="footer-glow"></div>
+
+    <div class="footer-inner container">
+
+      <div class="footer-brand">
+
+        <img
+          src="assets/mi-hub-logo.png"
+          alt="Mewar Innovators Hub"
+        >
+
+        <div>
+          <strong>Mewar Innovators Hub</strong>
+          <p>Ideas. Innovate. Grow.</p>
+        </div>
+
+      </div>
+
+      <div class="footer-column">
+
+        <h4>Explore</h4>
+
+        <a href="job.html">Home</a>
+        <a href="status.html">Check Status</a>
+        <a href="index.html#about">About</a>
+
+      </div>
+
+      <div class="footer-column social-column">
+
+        <h4>Follow Us On</h4>
+
+        <div class="footer-socials">
+
+          <a
+            href="https://www.instagram.com/mewarinnovatorshub/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+          >
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+
+          <a
+            href="https://www.linkedin.com/company/mewar-innovators-hub/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+          >
+            <i class="fa-brands fa-linkedin-in"></i>
+          </a>
+
+          <a
+            href="https://github.com/mihubindia"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+          >
+            <i class="fa-brands fa-github"></i>
+          </a>
+
+          <a
+            href="https://x.com/mdshahilraja301"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="X"
+          >
+            <i class="fa-brands fa-x-twitter"></i>
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="copyright">
+      © 2026 Mewar Innovators Hub. All Rights Reserved.
+    </div>
+
+  </footer>
+
+  <script src="job.js"></script>
+
+</body>
+</html>

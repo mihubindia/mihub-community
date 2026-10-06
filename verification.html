@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#020b1c">
+  <title>Document Verification | Mewar Innovators Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <link rel="stylesheet" href="Verification.css">
+</head>
+<body>
+
+  <div class="bg-effects">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="assets/mi-hub-logo.png" alt="Mewar Innovators Hub">
+      <div>
+        <strong>Mewar Innovators Hub</strong>
+        <span>OFFICIAL DOCUMENT VERIFICATION</span>
+      </div>
+    </a>
+
+    <a class="home-btn" href="index.html">
+      <i class="fa-solid fa-house"></i>
+      Home
+    </a>
+  </header>
+
+  <main class="page">
+
+    <section class="hero">
+      <div class="hero-badge">
+        <i class="fa-solid fa-shield-halved"></i>
+        Secure Document Verification
+      </div>
+
+      <h1>
+        Verify an Official
+        <span>MI Hub Document</span>
+      </h1>
+
+      <p>
+        Enter the Application ID and Offer ID exactly as shown on the official
+        Mewar Innovators Hub document.
+      </p>
+    </section>
+
+    <section class="verification-card">
+
+      <div class="card-top">
+        <div>
+          <span class="eyebrow">DOCUMENT VERIFICATION</span>
+          <h2>Verify Document</h2>
+        </div>
+
+        <div class="shield">
+          <i class="fa-solid fa-fingerprint"></i>
+        </div>
+      </div>
+
+      <form id="verificationForm">
+
+        <div class="field-grid">
+
+          <label>
+            <span>Application ID</span>
+
+            <div class="input-wrap">
+              <i class="fa-solid fa-id-card"></i>
+
+              <input
+                id="applicationId"
+                name="applicationId"
+                type="text"
+                placeholder="MIH-APP-2026-M1"
+                autocomplete="off"
+                required
+              >
+            </div>
+          </label>
+
+          <label>
+            <span>Offer ID</span>
+
+            <div class="input-wrap">
+              <i class="fa-solid fa-file-signature"></i>
+
+              <input
+                id="offerId"
+                name="offerId"
+                type="text"
+                placeholder="MIH-OFF-2026-M1"
+                autocomplete="off"
+                required
+              >
+            </div>
+          </label>
+
+        </div>
+
+        <button class="verify-btn" id="verifyBtn" type="submit">
+          <span>Verify Document</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+      </form>
+
+      <div class="message" id="message"></div>
+
+    </section>
+
+    <section class="result-card hidden" id="resultCard">
+
+      <div class="result-header">
+
+        <div class="verified-icon">
+          <i class="fa-solid fa-check"></i>
+        </div>
+
+        <div>
+          <span class="verified-label">
+            VERIFICATION SUCCESSFUL
+          </span>
+
+          <h2>Official Document Verified</h2>
+
+          <p>
+            The Application ID and Offer ID matched an MI Hub verification record.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="record-grid">
+
+        <div class="record-item">
+          <span>Application ID</span>
+          <strong id="resultApplicationId">-</strong>
+        </div>
+
+        <div class="record-item">
+          <span>Offer ID</span>
+          <strong id="resultOfferId">-</strong>
+        </div>
+
+        <div class="record-item">
+          <span>Document</span>
+          <strong id="resultDocumentName">-</strong>
+        </div>
+
+        <div class="record-item">
+          <span>Uploaded</span>
+          <strong id="resultUploadedAt">-</strong>
+        </div>
+
+      </div>
+
+      <div class="document-area">
+
+        <div class="document-head">
+
+          <div>
+            <span class="eyebrow">OFFICIAL DOCUMENT</span>
+            <h3 id="documentTitle">Verified Document</h3>
+          </div>
+
+          <a
+            id="openDocument"
+            class="document-btn"
+            href="#"
+            target="_blank"
+            rel="noopener"
+          >
+            <i class="fa-solid fa-up-right-from-square"></i>
+            Open
+          </a>
+
+        </div>
+
+        <div class="document-viewer" id="documentViewer"></div>
+
+      </div>
+
+      <div class="verification-footer">
+
+        <div>
+          <i class="fa-solid fa-shield-check"></i>
+          <span>Verified by Mewar Innovators Hub</span>
+        </div>
+
+        <button id="verifyAnother" type="button">
+          <i class="fa-solid fa-rotate"></i>
+          Verify Another
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+
+    <div>
+      <strong>Mewar Innovators Hub</strong>
+      <span>Official Document Verification Portal</span>
+    </div>
+
+    <div class="footer-right">
+      <span>MI Hub • Ideas. Innovate. Grow.</span>
+      <span> © 2026 Mewar Innovators Hub. All Rights Reserved.</span>
+    </div>
+
+  </footer>
+
+  <script src="Verification.js"></script>
+
+</body>
+</html>

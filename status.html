@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Check your Mewar Innovators Hub job application status.">
+  <title>Application Status | Mewar Innovators Hub</title>
+  <link rel="stylesheet" href="status.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+
+  <div class="background-glow glow-one"></div>
+  <div class="background-glow glow-two"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="job.html" class="brand">
+        <div class="brand-logo">
+        <img src="/assets/mi-hub-logo.png" alt="Mewar Innovators Hub Logo">
+      </div>
+        <span class="brand-text">Mewar Innovators Hub</span>
+      </a>
+
+      <a  href="job.html" style="background-color: rgb(239, 200, 6); color: black;" class="back-link" >
+        Apply for Jobs
+      </a>
+    </div>
+  </header>
+
+  <main class="page">
+
+    <section class="hero">
+      <div class="hero-badge">
+        Application Portal
+      </div>
+
+      <h1>
+        Check Your
+        <span>Application Status</span>
+      </h1>
+
+      <p>
+        Enter your Application ID and the email address used while
+        submitting your job application.
+      </p>
+    </section>
+
+    <section class="status-card">
+
+      <form id="statusForm">
+
+        <div class="form-group">
+          <label for="applicationId">
+            Application ID
+          </label>
+
+          <input
+            type="text"
+            id="applicationId"
+            name="applicationId"
+            placeholder="Example: MIH-2026-ABC123"
+            autocomplete="off"
+            required
+          >
+
+          <small>
+            Enter the Application ID you received after submitting the form.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="email">
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your application email"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <div id="formMessage" class="form-message"></div>
+
+        <button
+          type="submit"
+          id="checkStatusBtn"
+          class="check-btn"
+        >
+          <span id="buttonText">Check Application Status</span>
+          <span id="buttonLoader" class="button-loader hidden"></span>
+        </button>
+
+      </form>
+
+      <div id="statusResult" class="status-result hidden">
+
+        <div id="statusIcon" class="status-icon">
+          ✓
+        </div>
+
+        <div class="result-heading">
+          <span class="result-label">
+            Application Status
+          </span>
+
+          <h2 id="statusTitle">
+            Pending
+          </h2>
+
+          <p id="statusDescription"></p>
+        </div>
+
+        <div class="application-details">
+
+          <div class="detail-item">
+            <span>Application ID</span>
+            <strong id="resultApplicationId">-</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Applicant Name</span>
+            <strong id="resultName">-</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Email</span>
+            <strong id="resultEmail">-</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Submitted On</span>
+            <strong id="resultSubmittedAt">-</strong>
+          </div>
+
+          <div class="detail-item" id="decisionDateRow">
+            <span>Last Decision</span>
+            <strong id="resultDecisionDate">-</strong>
+          </div>
+
+        </div>
+
+        <div id="timeline" class="timeline">
+
+          <div class="timeline-item completed">
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-content">
+              <strong>Application Submitted</strong>
+              <span id="timelineSubmitted">
+                Application received
+              </span>
+            </div>
+          </div>
+
+          <div class="timeline-line"></div>
+
+          <div
+            id="timelineReview"
+            class="timeline-item active"
+          >
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-content">
+              <strong>Under Review</strong>
+              <span>
+                Your application is being reviewed by the MI Hub team.
+              </span>
+            </div>
+          </div>
+
+          <div class="timeline-line"></div>
+
+          <div
+            id="timelineDecision"
+            class="timeline-item"
+          >
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-content">
+              <strong id="timelineDecisionTitle">
+                Final Decision
+              </strong>
+
+              <span id="timelineDecisionText">
+                Decision will appear here.
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <div
+          id="rejectionBox"
+          class="rejection-box hidden"
+        >
+          <div class="rejection-title">
+            Application Rejection Reason
+          </div>
+
+          <p id="rejectionReason"></p>
+        </div>
+
+        <div
+          id="offerBox"
+          class="offer-box hidden"
+        >
+          <div class="offer-icon">
+            🎉
+          </div>
+
+          <div>
+            <strong>Application Approved</strong>
+
+            <p>
+              Your application has been approved by Mewar Innovators Hub.
+            </p>
+
+            <span id="offerMessage">
+              Please wait for further communication regarding your offer.
+            </span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          id="checkAgainBtn"
+          class="secondary-btn"
+          style="background-color: rgb(248, 195, 4);"
+        >
+          Check Another Application
+        </button>
+
+      </div>
+
+    </section>
+
+    <section class="info-section">
+
+      <div class="info-card">
+        <div class="info-number">01</div>
+
+        <div>
+          <h3>Application ID</h3>
+
+          <p>
+            Your unique Application ID is generated when your
+            application is submitted.
+          </p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-number">02</div>
+
+        <div>
+          <h3>Application Review</h3>
+
+          <p>
+            The MI Hub team reviews submitted applications before
+            making a decision.
+          </p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-number">03</div>
+
+        <div>
+          <h3>Live Status</h3>
+
+          <p>
+            Check this page anytime to see the latest status of
+            your application.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>Mewar Innovators Hub</strong>
+
+      <span>
+        Ideas. Innovate. Grow.
+      </span>
+    </div>
+    <div class="footer-column social-column">
+        <h4>Follow Us On</h4>
+        <div class="footer-socials">
+
+            <a href="https://www.instagram.com/mewarinnovatorshub/"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+
+            <a href="https://www.linkedin.com/company/mewar-innovators-hub/"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="LinkedIn">
+              <i class="fa-brands fa-linkedin-in"></i>
+              
+            </a>
+
+            <a href="https://github.com/mihubindia"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="GitHub">
+              <i class="fa-brands fa-github"></i>
+              
+            </a>
+
+            <a href="https://x.com/mdshahilraja301"
+   target="_blank"
+   rel="noopener noreferrer"
+   aria-label="X">
+  <i class="fa-brands fa-x-twitter"></i>
+</a>
+            
+      </div>
+    </div>
+
+    <p>
+      © 2026 Mewar Innovators Hub. All Rights Reserved.
+    </p>
+  </footer>
+
+  <script src="status.js"></script>
+</body>
+</html>
