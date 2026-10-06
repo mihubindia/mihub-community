@@ -28,7 +28,7 @@ const SMTP_PORT = Number(process.env.SMTP_PORT) || 465;
 const SMTP_SECURE = String(process.env.SMTP_SECURE || "true").toLowerCase() === "true";
 const SMTP_USER = process.env.SMTP_USER || ADMIN_EMAIL;
 const SMTP_PASS = process.env.SMTP_PASS || "";
-const PUBLIC_SITE_URL = process.env.PUBLIC_SITE_URL || "https://mihub-community.onrender.com";
+const PUBLIC_SITE_URL = process.env.PUBLIC_SITE_URL || "http://127.0.0.1:5502";
 const PUBLIC_STATUS_URL = process.env.PUBLIC_STATUS_URL || `${PUBLIC_SITE_URL}/status.html`;
 
 const OTP_EXPIRY_MS = 5 * 60 * 1000;
@@ -54,6 +54,9 @@ const mailer = nodemailer.createTransport({
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+
+const FRONTEND_DIR = path.join(__dirname, "..");
+app.use(express.static(FRONTEND_DIR));
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -295,7 +298,9 @@ async function sendJobApplicationConfirmationEmail(application) {
     });
 }
 
-app.get("/", (req, res) => res.json({ success: true, message: "Mewar Innovators Hub API is running", version: "3.0.0" }));
+app.get("/", (req, res) => {
+    res.sendFile(path.join(FRONTEND_DIR, "index.html"));
+});
 app.get("/api/health", (req, res) => res.json({ success: true, status: "OK", time: new Date().toISOString() }));
 
 app.post("/api/community", (req, res) => {
