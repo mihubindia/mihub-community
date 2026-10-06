@@ -27,12 +27,6 @@ const jobTable = document.getElementById("jobTable");
 const approvedGrid = document.getElementById("approvedGrid");
 const offerGrid = document.getElementById("offerGrid");
 const recentApplications = document.getElementById("recentApplications");
-const verificationForm = document.getElementById("verificationForm");
-const verificationDocument = document.getElementById("verificationDocument");
-const verificationFilePreview = document.getElementById("verificationFilePreview");
-const verificationMessage = document.getElementById("verificationMessage");
-const verificationGrid = document.getElementById("verificationGrid");
-const verificationRefresh = document.getElementById("verificationRefresh");
 
 const communitySearch = document.getElementById("communitySearch");
 const jobSearch = document.getElementById("jobSearch");
@@ -51,7 +45,6 @@ const toast = document.getElementById("toast");
 let currentJobs = [];
 let currentCommunity = [];
 let currentOffers = [];
-let currentVerifications = [];
 let otpRequestId = null;
 
 const API_BASE_URL = "https://mihub-community.onrender.com/api";
@@ -127,7 +120,7 @@ async function apiRequest(path, options = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     credentials: "include",
     headers
@@ -229,7 +222,7 @@ if (loginForm) {
 
     try {
       const data = await fetch(
-        `${API_BASE}/admin/login`,
+        `${API_BASE_URL}/admin/login`,
         {
           method: "POST",
           headers: {
@@ -386,7 +379,7 @@ if (verifyOtp) {
 
       try {
         const response = await fetch(
-          `${API_BASE}/admin/verify-otp`,
+          `${API_BASE_URL}/admin/verify-otp`,
           {
             method: "POST",
             headers: {
@@ -572,8 +565,7 @@ function openPage(page) {
     community: "Community Joining",
     jobs: "Job Applications",
     approved: "Approved Candidates",
-    offers: "Offer Letters",
-    verification: "Document Verification"
+    offers: "Offer Letters"
   };
 
   pageTitle.textContent =
@@ -607,7 +599,6 @@ if (logoutBtn) {
       currentJobs = [];
       currentCommunity = [];
       currentOffers = [];
-      currentVerifications = [];
 
       dashboard.classList.add("hidden");
       otpScreen.classList.add("hidden");
@@ -652,47 +643,41 @@ if (refreshBtn) {
 }
 
 async function loadServerData() {
-  const [communityResult, jobsResult, offersResult, verificationResult] = await Promise.allSettled([
+  const [
+    communityData,
+    jobsData,
+    offersData
+  ] = await Promise.all([
     apiRequest("/admin/community"),
     apiRequest("/admin/jobs"),
-    apiRequest("/admin/offers"),
-    apiRequest("/admin/verification")
+    apiRequest("/admin/offers")
   ]);
 
-  if (communityResult.status === "rejected") throw communityResult.reason;
-  if (jobsResult.status === "rejected") throw jobsResult.reason;
-  if (offersResult.status === "rejected") throw offersResult.reason;
+  currentCommunity =
+    Array.isArray(communityData)
+      ? communityData
+      : communityData.items ||
+        communityData.data ||
+        [];
 
-  const communityData = communityResult.value;
-  const jobsData = jobsResult.value;
-  const offersData = offersResult.value;
+  currentJobs =
+    Array.isArray(jobsData)
+      ? jobsData
+      : jobsData.items ||
+        jobsData.data ||
+        [];
 
-  currentCommunity = Array.isArray(communityData)
-    ? communityData
-    : communityData.items || communityData.data || [];
-
-  currentJobs = Array.isArray(jobsData)
-    ? jobsData
-    : jobsData.items || jobsData.data || [];
-
-  currentOffers = Array.isArray(offersData)
-    ? offersData
-    : offersData.items || offersData.data || [];
-
-  if (verificationResult.status === "fulfilled") {
-    const verificationData = verificationResult.value;
-    currentVerifications = Array.isArray(verificationData)
-      ? verificationData
-      : verificationData.items || verificationData.data || [];
-  } else {
-    currentVerifications = [];
-  }
+  currentOffers =
+    Array.isArray(offersData)
+      ? offersData
+      : offersData.items ||
+        offersData.data ||
+        [];
 
   return {
     community: currentCommunity,
     jobs: currentJobs,
-    offers: currentOffers,
-    verifications: currentVerifications
+    offers: currentOffers
   };
 }
 
@@ -703,7 +688,6 @@ function renderAll() {
   renderJobs();
   renderApproved();
   renderOffers();
-  renderVerifications();
 }
 
 function renderStats() {
@@ -884,9 +868,7 @@ function renderCommunity() {
           ${member.email || ""}
           ${member.university || ""}
           ${member.college || ""}
-          ${member.graduationInstitute || ""}
           ${domains}
-          ${member.skills || ""}
         `.toLowerCase();
 
         return text.includes(search);
@@ -943,16 +925,19 @@ function renderCommunity() {
               ${escapeHtml(
                 member.university ||
                   member.college ||
-                  member.graduationInstitute ||
                   "-"
               )}
             </td>
 
             <td>
               ${escapeHtml(
-                Array.isArray(member.domains)
+                Array.isArray(
+                  member.domains
+                )
                   ? member.domains.join(", ")
-                  : member.domains || member.domain || "-"
+                  : member.domains ||
+                    member.domain ||
+                    "-"
               )}
             </td>
 
@@ -996,153 +981,300 @@ function renderCommunity() {
       .join("");
 }
 
-function getEmploymentTypes(job) {
-  const labels = [];
-  if (job.internship === true || job.internship === "true") labels.push("Internship");
-  if (job.fullTime === true || job.fullTime === "true") labels.push("Full Time");
-  if (job.partTime === true || job.partTime === "true") labels.push("Part Time");
-  if (!labels.length && Array.isArray(job.employmentTypes)) return job.employmentTypes.filter(Boolean);
-  if (!labels.length && typeof job.employmentTypes === "string") return [job.employmentTypes];
-  return labels;
-}
-
-function getWorkModes(job) {
-  const labels = [];
-  if (job.remote === true || job.remote === "true") labels.push("Remote");
-  if (job.hybrid === true || job.hybrid === "true") labels.push("Hybrid");
-  if (job.onsite === true || job.onsite === "true") labels.push("Onsite");
-  if (!labels.length && Array.isArray(job.workModes)) return job.workModes.filter(Boolean);
-  if (!labels.length && typeof job.workModes === "string") return [job.workModes];
-  return labels;
-}
-
-function getAvailabilityText(job) {
-  const employment = getEmploymentTypes(job);
-  const modes = getWorkModes(job);
-  const parts = [];
-  if (employment.length) parts.push(employment.join(", "));
-  if (modes.length) parts.push(modes.join(", "));
-  if (job.availableFrom) parts.push(`From ${formatDate(job.availableFrom)}`);
-  if (job.duration) parts.push(job.duration);
-  return parts.join(" • ") || "Not provided";
-}
-
 function renderJobs() {
-  const search = jobSearch.value.trim().toLowerCase();
-  const filter = jobFilter.value;
+  const search =
+    jobSearch.value
+      .trim()
+      .toLowerCase();
 
-  const filtered = currentJobs.filter(job => {
-    const employment = getEmploymentTypes(job).join(" ");
-    const modes = getWorkModes(job).join(" ");
-    const text = `
-      ${job.applicationId || job.applicantId || job.id || ""}
-      ${job.fullName || ""}
-      ${job.email || ""}
-      ${job.phone || ""}
-      ${job.degree || ""}
-      ${job.specialization || ""}
-      ${job.university || ""}
-      ${employment}
-      ${modes}
-      ${job.duration || ""}
-    `.toLowerCase();
+  const filter =
+    jobFilter.value;
 
-    const matchesSearch = text.includes(search);
-    const matchesFilter = filter === "all" || (job.status || "pending") === filter;
-    return matchesSearch && matchesFilter;
-  });
+  const filtered =
+    currentJobs.filter(job => {
+      const domains =
+        Array.isArray(job.domains)
+          ? job.domains.join(" ")
+          : job.domains || job.domain || "";
+
+      const skills =
+        Array.isArray(job.skills)
+          ? job.skills.join(" ")
+          : job.skills || "";
+
+      const text = `
+        ${job.fullName || ""}
+        ${job.email || ""}
+        ${job.degree || ""}
+        ${job.specialization || ""}
+        ${domains}
+        ${skills}
+      `.toLowerCase();
+
+      const matchesSearch =
+        text.includes(search);
+
+      const matchesFilter =
+        filter === "all" ||
+        (job.status || "pending") ===
+          filter;
+
+      return (
+        matchesSearch &&
+        matchesFilter
+      );
+    });
 
   if (!filtered.length) {
-    jobTable.innerHTML = '<tr><td colspan="6">No job applications found.</td></tr>';
+    jobTable.innerHTML =
+      '<tr><td colspan="7">No job applications found.</td></tr>';
     return;
   }
 
-  jobTable.innerHTML = filtered.map(job => `
-    <tr>
-      <td>
-        <div class="user-cell">
-          <div class="user-avatar">${initials(job.fullName)}</div>
-          <div>
-            <strong>${escapeHtml(job.fullName || "-")}</strong>
-            <span>${escapeHtml(job.email || "-")}</span>
-          </div>
-        </div>
-      </td>
-      <td>
-        ${escapeHtml(job.degree || "-")}<br>
-        ${escapeHtml(job.specialization || job.university || "")}
-      </td>
-      <td>${escapeHtml(getAvailabilityText(job))}</td>
-      <td>${formatDate(job.createdAt || job.submittedAt)}</td>
-      <td>
-        <span class="status ${escapeHtml(job.status || "pending")}">
-          ${escapeHtml(job.status || "pending")}
-        </span>
-      </td>
-      <td>
-        <div class="action-group">
-          <button class="action-btn" onclick="viewJob('${escapeAttribute(job.id)}')">
-            <i class="fa-solid fa-eye"></i>
-          </button>
-          ${job.status !== "approved" ? `
-            <button class="action-btn approve" onclick="approveJob('${escapeAttribute(job.id)}')">
-              <i class="fa-solid fa-check"></i>
-            </button>
-          ` : ""}
-          ${job.status !== "rejected" ? `
-            <button class="action-btn" onclick="rejectJob('${escapeAttribute(job.id)}')">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          ` : ""}
-          <button class="action-btn delete" onclick="deleteJob('${escapeAttribute(job.id)}')">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </div>
-      </td>
-    </tr>
-  `).join("");
+  jobTable.innerHTML =
+    filtered
+      .map(
+        job => `
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar">
+                  ${initials(
+                    job.fullName
+                  )}
+                </div>
+
+                <div>
+                  <strong>
+                    ${escapeHtml(
+                      job.fullName || "-"
+                    )}
+                  </strong>
+
+                  <span>
+                    ${escapeHtml(
+                      job.email || "-"
+                    )}
+                  </span>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              ${escapeHtml(
+                job.degree || "-"
+              )}
+              <br>
+              ${escapeHtml(
+                job.specialization ||
+                  ""
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                Array.isArray(
+                  job.domains
+                )
+                  ? job.domains.join(", ")
+                  : job.domains ||
+                    job.domain ||
+                    "-"
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                [
+                  ...(Array.isArray(job.availability) ? job.availability : job.availability ? [job.availability] : []),
+                  job.internship,
+                  job.workMode || job.mode || job.workType,
+                  job.availableFrom,
+                  job.duration
+                ]
+                  .filter(Boolean)
+                  .join(", ") || "-"
+              )}
+            </td>
+
+            <td>
+              ${formatDate(
+                job.createdAt ||
+                  job.submittedAt
+              )}
+            </td>
+
+            <td>
+              <span class="status ${escapeHtml(
+                job.status ||
+                  "pending"
+              )}">
+                ${escapeHtml(
+                  job.status ||
+                    "pending"
+                )}
+              </span>
+            </td>
+
+            <td>
+              <div class="action-group">
+                <button
+                  class="action-btn"
+                  onclick="viewJob('${escapeAttribute(
+                    job.id
+                  )}')"
+                >
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+
+                ${
+                  job.status !==
+                  "approved"
+                    ? `
+                      <button
+                        class="action-btn approve"
+                        onclick="approveJob('${escapeAttribute(
+                          job.id
+                        )}')"
+                      >
+                        <i class="fa-solid fa-check"></i>
+                      </button>
+                    `
+                    : ""
+                }
+
+                ${
+                  job.status !==
+                  "rejected"
+                    ? `
+                      <button
+                        class="action-btn"
+                        onclick="rejectJob('${escapeAttribute(
+                          job.id
+                        )}')"
+                      >
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    `
+                    : ""
+                }
+
+                <button
+                  class="action-btn delete"
+                  onclick="deleteJob('${escapeAttribute(
+                    job.id
+                  )}')"
+                >
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `
+      )
+      .join("");
 }
 
 function renderApproved() {
-  const approved = currentJobs.filter(job => job.status === "approved");
+  const approved =
+    currentJobs.filter(
+      job => job.status === "approved"
+    );
 
   if (!approved.length) {
-    approvedGrid.innerHTML = '<div class="empty-state">No approved candidates yet.</div>';
+    approvedGrid.innerHTML =
+      '<div class="empty-state">No approved candidates yet.</div>';
     return;
   }
 
-  approvedGrid.innerHTML = approved.map(job => `
-    <div class="approved-card">
-      <div class="card-user">
-        <div class="card-user-avatar">${initials(job.fullName)}</div>
-        <div>
-          <strong>${escapeHtml(job.fullName || "-")}</strong>
-          <span>${escapeHtml(job.email || "-")}</span>
-        </div>
-      </div>
-      <div class="card-details">
-        <div>
-          <span>Application ID</span>
-          <b>${escapeHtml(job.applicationId || job.applicantId || job.id || "-")}</b>
-        </div>
-        <div>
-          <span>Education</span>
-          <b>${escapeHtml(job.degree || "-")}</b>
-        </div>
-        <div>
-          <span>Availability</span>
-          <b>${escapeHtml(getAvailabilityText(job))}</b>
-        </div>
-      </div>
-      <div class="card-actions">
-        <button class="btn primary" onclick="openOfferModal('${escapeAttribute(job.id)}')">
-          <i class="fa-solid fa-file-signature"></i>
-          Offer Letter
-        </button>
-        <button class="btn" onclick="viewJob('${escapeAttribute(job.id)}')">View</button>
-      </div>
-    </div>
-  `).join("");
+  approvedGrid.innerHTML =
+    approved
+      .map(
+        job => `
+          <div class="approved-card">
+            <div class="card-user">
+              <div class="card-user-avatar">
+                ${initials(
+                  job.fullName
+                )}
+              </div>
+
+              <div>
+                <strong>
+                  ${escapeHtml(
+                    job.fullName || "-"
+                  )}
+                </strong>
+
+                <span>
+                  ${escapeHtml(
+                    job.email || "-"
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div class="card-details">
+              <div>
+                <span>Domain</span>
+                <b>
+                  ${escapeHtml(
+                    Array.isArray(
+                      job.domains
+                    )
+                      ? job.domains.join(", ")
+                      : job.domains ||
+                        job.domain ||
+                        "-"
+                  )}
+                </b>
+              </div>
+
+              <div>
+                <span>Education</span>
+                <b>
+                  ${escapeHtml(
+                    job.degree || "-"
+                  )}
+                </b>
+              </div>
+
+              <div>
+                <span>Approved</span>
+                <b>
+                  ${formatDate(
+                    job.approvedAt ||
+                      job.createdAt ||
+                      job.submittedAt
+                  )}
+                </b>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button
+                class="btn primary"
+                onclick="openOfferModal('${escapeAttribute(
+                  job.id
+                )}')"
+              >
+                <i class="fa-solid fa-file-signature"></i>
+                Offer Letter
+              </button>
+
+              <button
+                class="btn"
+                onclick="viewJob('${escapeAttribute(
+                  job.id
+                )}')"
+              >
+                View
+              </button>
+            </div>
+          </div>
+        `
+      )
+      .join("");
 }
 
 function renderOffers() {
@@ -1238,94 +1370,104 @@ function renderOffers() {
 }
 
 function viewCommunity(id) {
-  const member = currentCommunity.find(
-    item => String(item.id) === String(id)
-  );
+  const member =
+    currentCommunity.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
 
   if (!member) return;
 
-  const value = (item, fallback = "Not provided") => {
-    if (item === null || item === undefined || item === "") return fallback;
-    if (Array.isArray(item)) return item.length ? item.join(", ") : fallback;
-    if (typeof item === "object") return Object.values(item).filter(Boolean).join(", ") || fallback;
-    return String(item);
-  };
-
-  const section = (title, content) => `
-    <div style="margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,.08);">
-      <h3 style="margin:0 0 12px;font-size:15px;">${escapeHtml(title)}</h3>
-      ${content}
-    </div>
-  `;
-
   drawerContent.innerHTML = `
     <div class="detail-head">
-      <span class="eyebrow">COMMUNITY MEMBER</span>
-      <h2>${escapeHtml(value(member.fullName, "Unnamed Member"))}</h2>
-      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
-        <span class="status ${escapeHtml(member.status || "pending")}">${escapeHtml(member.status || "pending")}</span>
-      </div>
+      <span class="eyebrow">
+        COMMUNITY MEMBER
+      </span>
+
+      <h2>
+        ${escapeHtml(
+          member.fullName || "-"
+        )}
+      </h2>
     </div>
 
-    ${section("Personal Information", `
-      ${detailRow("Application ID", value(member.applicationId || member.applicantId || member.id))}
-      ${detailRow("Full Name", value(member.fullName))}
-      ${detailRow("Email", value(member.email))}
-      ${detailRow("Mobile", value(member.phone))}
-      ${detailRow("City", value(member.city))}
-      ${detailRow("State", value(member.state))}
-    `)}
+    ${detailRow(
+      "Application ID",
+      member.id
+    )}
 
-    ${section("Secondary Education (10th)", `
-      ${detailRow("Board", value(member.tenthBoard))}
-      ${detailRow("Passing Year", value(member.tenthYear))}
-      ${detailRow("Percentage", value(member.tenthPercentage))}
-    `)}
+    ${detailRow(
+      "Email",
+      member.email
+    )}
 
-    ${section("Senior Secondary Education (12th)", `
-      ${detailRow("Board", value(member.twelfthBoard))}
-      ${detailRow("Passing Year", value(member.twelfthYear))}
-      ${detailRow("Percentage", value(member.twelfthPercentage))}
-    `)}
+    ${detailRow(
+      "Phone",
+      member.phone
+    )}
 
-    ${section("Graduation", `
-      ${detailRow("University / College", value(member.university || member.college || member.graduationInstitute))}
-      ${detailRow("Degree", value(member.degree))}
-      ${detailRow("Branch", value(member.branch || member.specialization))}
-      ${detailRow("Current Year", value(member.currentYear))}
-      ${detailRow("Current Semester", value(member.semester))}
-      ${detailRow("Expected Graduation Year", value(member.graduationYear || member.expectedGraduationYear))}
-    `)}
+    ${detailRow(
+      "College / University",
+      member.university ||
+        member.college
+    )}
 
-    ${section("Career Interests & Skills", `
-      ${detailRow("Domain", value(member.domains || member.domain))}
-      ${detailRow("Skills", value(member.skillsList || member.skills))}
-      ${detailRow("Why Join MI Hub", value(member.reason))}
-      ${detailRow("Additional Description", value(member.description))}
-    `)}
+    ${detailRow(
+      "Degree",
+      member.degree
+    )}
 
-    ${section("Submission", `
-      ${detailRow("Status", value(member.status, "pending"))}
-      ${detailRow("Submitted", formatDate(member.submittedAt || member.createdAt))}
-    `)}
+    ${detailRow(
+      "Branch",
+      member.specialization ||
+        member.branch
+    )}
 
-    <div style="margin-top:25px;display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn delete" onclick="deleteCommunity('${escapeAttribute(member.id)}');closeDrawer();">Delete</button>
-    </div>
+    ${detailRow(
+      "Current Year",
+      member.currentYear
+    )}
+
+    ${detailRow(
+      "Semester",
+      member.semester
+    )}
+
+    ${detailRow(
+      "Domain",
+      Array.isArray(
+        member.domains
+      )
+        ? member.domains.join(", ")
+        : member.domains
+    )}
+
+    ${detailRow(
+      "Joined",
+      formatDate(
+        member.createdAt ||
+          member.submittedAt
+      )
+    )}
   `;
 
-  detailsDrawer.classList.remove("hidden");
+  detailsDrawer.classList.remove(
+    "hidden"
+  );
 }
 
 function viewJob(id) {
-  const job = currentJobs.find(item => String(item.id) === String(id));
+  const job = currentJobs.find(
+    item => String(item.id) === String(id)
+  );
+
   if (!job) return;
 
   const value = (item, fallback = "Not provided") => {
     if (item === null || item === undefined || item === "") return fallback;
     if (Array.isArray(item)) return item.length ? item.join(", ") : fallback;
     if (typeof item === "object") return Object.values(item).filter(Boolean).join(", ") || fallback;
-    if (typeof item === "boolean") return item ? "Yes" : "No";
     return String(item);
   };
 
@@ -1347,29 +1489,26 @@ function viewJob(id) {
     </div>
   `;
 
-  const employmentTypes = getEmploymentTypes(job);
-  const workModes = getWorkModes(job);
-  const resume = job.resume || {};
-  const profilePhoto = job.profilePhoto || {};
-
-  const documentButton = (label, document, icon) => {
-    if (!document || !document.data) return detailRow(label, "Not provided");
-    const href = escapeAttribute(document.data);
-    return `
-      <div class="detail-row">
-        <span>${escapeHtml(label)}</span>
-        <strong>
-          <a href="${href}" target="_blank" rel="noopener noreferrer" download="${escapeAttribute(document.name || label)}">
-            <i class="fa-solid ${icon}"></i> Open Document
-          </a>
-        </strong>
-      </div>
-    `;
+  const booleanLabel = (value, yes = "Yes", no = "No") => {
+    if (value === true || String(value).toLowerCase() === "true") return yes;
+    if (value === false || String(value).toLowerCase() === "false") return no;
+    return "Not provided";
   };
 
-  const profilePreview = profilePhoto.data
-    ? `<div style="margin:12px 0;text-align:center;"><img src="${escapeAttribute(profilePhoto.data)}" alt="Profile Photo" style="max-width:180px;max-height:180px;border-radius:14px;object-fit:cover;border:1px solid rgba(255,255,255,.12);"></div>`
-    : "";
+  const selectedEmployment = [
+    job.internship ? "Internship" : "",
+    job.fullTime ? "Full Time" : "",
+    job.partTime ? "Part Time" : ""
+  ].filter(Boolean);
+
+  const selectedWorkModes = [
+    job.remote ? "Remote" : "",
+    job.hybrid ? "Hybrid" : "",
+    job.onsite ? "On-site" : ""
+  ].filter(Boolean);
+
+  const resume = job.resume || {};
+  const profilePhoto = job.profilePhoto || {};
 
   drawerContent.innerHTML = `
     <div class="detail-head">
@@ -1422,19 +1561,17 @@ function viewJob(id) {
     `)}
 
     ${section("Availability", `
-      ${detailRow("Employment Types", employmentTypes.length ? employmentTypes.join(", ") : "Not provided")}
-      ${detailRow("Work Modes", workModes.length ? workModes.join(", ") : "Not provided")}
-      ${detailRow("Available From", job.availableFrom ? formatDate(job.availableFrom) : "Not provided")}
+      ${detailRow("Employment Types", selectedEmployment.length ? selectedEmployment.join(", ") : "Not provided")}
+      ${detailRow("Work Modes", selectedWorkModes.length ? selectedWorkModes.join(", ") : "Not provided")}
+      ${detailRow("Available From", value(job.availableFrom))}
       ${detailRow("Preferred Duration", value(job.duration))}
     `)}
 
     ${section("Documents", `
-      ${detailRow("Resume Name", value(resume.name))}
+      ${detailRow("Resume Name", value(resume.name || resume.originalName))}
       ${detailRow("Resume Type", value(resume.type))}
       ${detailRow("Resume Size", resume.size ? `${Math.round(Number(resume.size) / 1024)} KB` : "Not provided")}
-      ${documentButton("Resume", resume, "fa-file-arrow-down")}
-      ${profilePreview}
-      ${detailRow("Profile Photo", value(profilePhoto.name))}
+      ${detailRow("Profile Photo", value(profilePhoto.name || profilePhoto.originalName))}
       ${detailRow("Profile Photo Type", value(profilePhoto.type))}
     `)}
 
@@ -1442,28 +1579,32 @@ function viewJob(id) {
       ${detailRow("Declaration", value(job.declaration))}
       ${detailRow("Status", value(job.status, "pending"))}
       ${detailRow("Submitted", formatDate(job.submittedAt || job.createdAt))}
-      ${detailRow("Approved At", job.approvedAt ? formatDate(job.approvedAt) : "-")}
+      ${detailRow("Approved At", formatDate(job.approvedAt))}
       ${detailRow("Approved By", value(job.approvedBy))}
-      ${detailRow("Rejected At", job.rejectedAt ? formatDate(job.rejectedAt) : "-")}
+      ${detailRow("Rejected At", formatDate(job.rejectedAt))}
       ${detailRow("Rejected By", value(job.rejectedBy))}
       ${detailRow("Rejection Reason", value(job.rejectionReason))}
     `)}
 
     <div style="margin-top:25px;display:flex;gap:8px;flex-wrap:wrap;">
-      ${job.status !== "approved" ? `
-        <button class="btn primary" onclick="approveJob('${escapeAttribute(job.id)}');closeDrawer();">
-          Approve
-        </button>
-      ` : `
-        <button class="btn primary" onclick="openOfferModal('${escapeAttribute(job.id)}');closeDrawer();">
-          Offer Letter
-        </button>
-      `}
-      ${job.status !== "rejected" ? `
-        <button class="btn" onclick="rejectJob('${escapeAttribute(job.id)}');closeDrawer();">
-          Reject
-        </button>
-      ` : ""}
+      ${job.status !== "approved"
+        ? `
+          <button class="btn primary" onclick="approveJob('${escapeAttribute(job.id)}');closeDrawer();">
+            Approve
+          </button>
+        `
+        : `
+          <button class="btn primary" onclick="openOfferModal('${escapeAttribute(job.id)}');closeDrawer();">
+            Offer Letter
+          </button>
+        `}
+      ${job.status !== "rejected"
+        ? `
+          <button class="btn" onclick="rejectJob('${escapeAttribute(job.id)}');closeDrawer();">
+            Reject
+          </button>
+        `
+        : ""}
     </div>
   `;
 
@@ -2052,425 +2193,294 @@ function printOffer(id) {
 }
 
 function printOfferObject(offer) {
-  const printWindow = window.open("", "_blank", "width=900,height=1100");
+  const printWindow =
+    window.open(
+      "",
+      "_blank",
+      "width=900,height=900"
+    );
 
   if (!printWindow) {
-    showToast("Please allow pop-ups to print the offer letter.", "error");
+    showToast(
+      "Please allow pop-ups to print the offer letter.",
+      "error"
+    );
     return;
   }
-
-  const candidateName = offer.candidateName || "-";
-  const jobTitle = offer.jobTitle || offer.role || "-";
-  const department = offer.department || "-";
-  const joiningDate = formatDate(offer.joiningDate);
-  const issueDate = formatDate(offer.issueDate || offer.createdAt);
-  const location = offer.location || offer.workType || "-";
-  const employmentType = offer.employmentType || "-";
-  const salary = offer.salary || "-";
-  const reference = offer.referenceNo || offer.offerId || offer.id || "MIH/HR/OFFER/001";
-  const additionalMessage = offer.additionalMessage || "";
 
   const html = `
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${escapeHtml(reference)} | Offer Letter | Mewar Innovators Hub</title>
-<style>
-@page{size:A4 portrait;margin:0}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#fff;color:#064da8;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-body{font-size:9.3pt;line-height:1.28}
-.sheet{width:210mm;height:297mm;padding:8mm 9mm 7mm;margin:0 auto;position:relative;overflow:hidden;background:#fff}
-.top-accent{position:absolute;top:0;left:0;width:31mm;height:3mm;background:#f47a20;transform:skewX(-38deg);transform-origin:left top}
-.top-accent2{position:absolute;top:0;left:0;width:43mm;height:1.5mm;background:#0b4da2;transform:skewX(-38deg);transform-origin:left top}
-.header{height:27mm;display:grid;grid-template-columns:58% 42%;align-items:center;border-bottom:1.1px solid #0b5fc7;padding-bottom:3mm}
-.logo-wrap{display:flex;align-items:center;height:100%}
-.logo{width:66mm;height:auto;max-height:23mm;object-fit:contain;object-position:left center}
-.contact{border-left:1.2px solid #0b5fc7;padding-left:7mm;display:grid;gap:1.25mm;font-size:8.3pt;font-weight:700;line-height:1.15}
-.contact div{display:flex;align-items:center;gap:2.5mm;white-space:nowrap}
-.contact .icon{width:4mm;text-align:center;font-size:10pt}
-.rule-row{display:grid;grid-template-columns:1fr auto 1fr;gap:4mm;align-items:center;margin:4mm 0 3mm}
-.rule{height:1px;background:#0b5fc7}
-.title{margin:0;padding:2mm 10mm;background:#1158a8;color:#fff;font-size:18pt;line-height:1;font-weight:800;letter-spacing:1px;text-align:center;white-space:nowrap}
-.meta{display:flex;justify-content:space-between;font-size:8.6pt;font-weight:700;margin-bottom:3.2mm}
-.recipient{margin-bottom:3mm;font-size:9.3pt;line-height:1.32}
-.recipient strong{font-size:10.5pt}
-.salutation{margin:2.5mm 0 1.5mm}
-.intro{margin:0 0 2.5mm;text-align:justify}
-.section-title{display:flex;align-items:center;gap:2.5mm;font-size:11.3pt;font-weight:800;margin:2.4mm 0 1.4mm}
-.section-no{font-size:11.5pt;min-width:6mm}
-.details{width:100%;border-collapse:collapse;font-size:8.7pt;margin-bottom:2.2mm}
-.details th,.details td{border:1px solid #3b91e8;padding:1.35mm 2.2mm;text-align:left;vertical-align:middle}
-.details th{background:#d9efff;font-weight:800}
-.terms{margin:0;padding-left:7mm;font-size:8.6pt}
-.terms li{padding-left:1mm;margin-bottom:1.15mm;text-align:justify}
-.closing{margin:2.5mm 0 1.8mm;text-align:justify}
-.sign-area{display:grid;grid-template-columns:1fr 1fr 1fr 32mm;gap:4mm;align-items:end;margin-top:2.2mm}
-.sign{height:24mm;text-align:center;font-size:7.8pt}
-.sign-name{font-family:"Brush Script MT","Segoe Script",cursive;font-size:17pt;color:#0b4fd0;line-height:1.05;margin-bottom:1mm}
-.sign-line{border-top:1px solid #0b5fc7;margin-bottom:1mm}
-.sign strong{font-size:8pt}
-.seal{width:30mm;height:30mm;object-fit:contain;align-self:end;justify-self:end}
-.acceptance{border-top:1px solid #0b5fc7;margin-top:2.5mm;padding-top:1.7mm}
-.acceptance-title{text-align:center;font-weight:800;font-size:10.8pt;margin-bottom:1.5mm}
-.acceptance p{margin:0 0 2mm;font-size:8.5pt}
-.accept-grid{display:grid;grid-template-columns:28mm 1fr 14mm 32mm;gap:2mm;align-items:end;font-size:8.2pt}
-.accept-line{border-bottom:1px solid #333;height:4.5mm}
-.footer{position:absolute;left:9mm;right:9mm;bottom:5mm;border-top:1px solid #0b5fc7;padding-top:1.8mm;text-align:center;font-weight:800;font-size:8.8pt;color:#fff;background:#0750a7;min-height:8mm;display:flex;align-items:center;justify-content:center}
-.footer:before{content:"";position:absolute;left:-9mm;bottom:-5mm;width:22mm;height:10mm;background:#f47a20;transform:skewX(38deg)}
-.footer:after{content:"";position:absolute;right:-9mm;bottom:-5mm;width:22mm;height:10mm;background:#f47a20;transform:skewX(-38deg)}
-.sign {
-    height: 24mm !important;
-    text-align: center !important;
-    font-size: 7.8pt !important;
-    position: relative !important;
-    line-height: 1 !important;
-}
+    <!doctype html>
+    <html>
+    <head>
+      <title>
+        ${escapeHtml(
+          offer.id ||
+            "Offer Letter"
+        )}
+        | Mewar Innovators Hub
+      </title>
 
-.signature-img {
-    width: 105px !important;
-    height: 42px !important;
-    object-fit: contain !important;
-    display: block !important;
-    margin: 0 auto 0 !important;
-}
+      <style>
+        body {
+          margin: 0;
+          padding: 50px;
+          font-family: Arial, sans-serif;
+          color: #111;
+          line-height: 1.6;
+        }
 
-.sign-line {
-    width: 105px !important;
-    border-top: 1px solid #0b5fc7 !important;
-    margin: 0 auto 0.8mm !important;
-}
+        .letter {
+          max-width: 800px;
+          margin: auto;
+          border: 1px solid #ddd;
+          padding: 55px;
+        }
 
-.sign strong {
-    display: block !important;
-    font-size: 8pt !important;
-    line-height: 1 !important;
-    margin: 0 !important;
-}
+        .header {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          padding-bottom: 25px;
+          border-bottom: 2px solid #111;
+        }
 
-.sign br {
-    display: none !important;
-}
+        .company {
+          text-align: right;
+        }
 
-.sign strong::after {
-    content: "";
-    display: block;
-    height: 0.8mm;
-}
+        .company strong {
+          display: block;
+          font-size: 20px;
+        }
 
-.sign {
-    line-height: 1 !important;
-}
-@media screen{body{background:#e9eef5}.sheet{box-shadow:0 0 18px rgba(0,0,0,.18)}}
-@media print{body{background:#fff}.sheet{box-shadow:none}}
-</style>
-</head>
-<body>
-<div class="sheet">
-  <div class="top-accent"></div>
-  <div class="top-accent2"></div>
+        .company span {
+          color: #e67b1e;
+          font-size: 12px;
+        }
 
- 
+        h1 {
+          text-align: center;
+          margin: 45px 0 35px;
+          font-size: 25px;
+          letter-spacing: 2px;
+        }
 
-  <div class="meta">
-    <span>Ref. No.: ${escapeHtml(reference)}</span>
-    <span>Date: ${escapeHtml(issueDate)}</span>
-  </div>
+        .date {
+          text-align: right;
+          margin-bottom: 30px;
+        }
 
-  <div class="rule-row">
-    <div class="rule"></div>
-    <h1 class="title">OFFER LETTER</h1>
-    <div class="rule"></div>
-  </div>
+        .content {
+          font-size: 14px;
+        }
 
-  <div class="recipient">
-    <div>To,</div>
-    <strong>Mr./Ms. ${escapeHtml(candidateName)}</strong>
-  </div>
+        .details {
+          margin: 25px 0;
+          padding: 20px;
+          background: #f5f5f5;
+        }
 
-  <div class="salutation">Dear <strong>${escapeHtml(candidateName)}</strong>,</div>
+        .details p {
+          margin: 7px 0;
+        }
 
-  <p class="intro">We are pleased to offer you employment with <strong>MI HUB</strong> for the position of <strong>${escapeHtml(jobTitle)}</strong>, subject to the terms and conditions mentioned in this letter.</p>
+        .signature {
+          margin-top: 70px;
+        }
 
-  <div class="section-title"><span class="section-no">1.</span><span>Employment Details</span></div>
-  <table class="details">
-    <thead><tr><th style="width:39%">Particulars</th><th>Details</th></tr></thead>
-    <tbody>
-      <tr><td>Designation</td><td>${escapeHtml(jobTitle)}</td></tr>
-      <tr><td>Department</td><td>${escapeHtml(department)}</td></tr>
-      <tr><td>Joining Date</td><td>${escapeHtml(joiningDate)}</td></tr>
-      <tr><td>Work Type</td><td>${escapeHtml(location)}</td></tr>
-      <tr><td>Duration</td><td>${escapeHtml(employmentType)}</td></tr>
-      <tr><td>Compensation</td><td>${escapeHtml(salary)}</td></tr>
-    </tbody>
-  </table>
+        .footer {
+          margin-top: 60px;
+          padding-top: 15px;
+          border-top: 1px solid #ddd;
+          text-align: center;
+          color: #777;
+          font-size: 11px;
+        }
 
-  <div class="section-title"><span class="section-no">2.</span><span>Terms and Conditions</span></div>
-  <ol class="terms">
-    <li>Your employment will be subject to the applicable probation period and company policies.</li>
-    <li>You will be entitled to applicable benefits as per the company's policy and the nature of your engagement.</li>
-    <li>The notice period for resignation will be as specified in the applicable company policy or agreement.</li>
-    <li>Your employment is subject to satisfactory verification of the information and documents provided by you.</li>
-    <li>You are expected to abide by the company's rules, policies and code of conduct, as amended from time to time.</li>
-  </ol>
+        @media print {
+          body {
+            padding: 0;
+          }
 
-  ${additionalMessage ? `<p class="closing"><strong>Additional Terms:</strong> ${escapeHtml(additionalMessage)}</p>` : ""}
-  <p class="closing">Please sign and return a copy of this letter as confirmation of your acceptance of this offer. We look forward to having you as a part of our team and wish you a successful career with us.</p>
+          .letter {
+            border: 0;
+          }
+        }
+      </style>
+    </head>
 
-  <div style="font-weight:800;margin-top:1mm">For MI HUB</div>
+    <body>
+      <div class="letter">
+        <div class="header">
+          <div class="company">
+            <strong>
+              Mewar Innovators Hub
+            </strong>
 
-  <div class="sign-area">
-    <div class="sign">
-        <img class="signature-img" src="${new URL("assets/md-salman-signature.png", window.location.href).href}" alt="Md Salman Signature">
-        <div class="sign-line"></div>
-        <strong>(MD SALMAN)</strong>
-        <br>
-        CEO
-    </div>
+            <span>
+              Ideas. Innovate. Grow.
+            </span>
+          </div>
+        </div>
 
-    <div class="sign">
-        <img class="signature-img" src="${new URL("assets/sujit-kumar-signature.png", window.location.href).href}" alt="Sujit Kumar Signature">
-        <div class="sign-line"></div>
-        <strong>(SUJIT KUMAR)</strong>
-        <br>
-        Founder
-    </div>
+        <h1>
+          OFFER LETTER
+        </h1>
 
-    <div class="sign">
-        <img class="signature-img" src="${new URL("assets/md-shahil-raja-signature.png", window.location.href).href}" alt="Md Shahil Raja Signature">
-        <div class="sign-line"></div>
-        <strong>(MD SHAHIL RAJA)</strong>
-        <br>
-        Co-Founder
-    </div>
+        <div class="date">
+          Date:
+          ${escapeHtml(
+            formatDate(
+              offer.issueDate ||
+                offer.createdAt
+            )
+          )}
+        </div>
 
-    <img class="seal" src="${new URL("assets/mi-hub-seal.png", window.location.href).href}" alt="MI Hub Seal">
-</div>
+        <div class="content">
+          <p>
+            Dear
+            <strong>
+              ${escapeHtml(
+                offer.candidateName ||
+                  "-"
+              )}
+            </strong>,
+          </p>
 
-  <div class="acceptance">
-    <div class="acceptance-title">ACCEPTANCE OF OFFER</div>
-    <p>I, <strong>${escapeHtml(candidateName)}</strong>, hereby accept the offer of employment with <strong>MI HUB</strong> on the terms and conditions stated above.</p>
-    <div class="accept-grid">
-      <span>Signature:</span><span class="accept-line"></span><span>Name:</span><span>${escapeHtml(candidateName)}</span>
-      <span>Date:</span><span class="accept-line"></span><span>Offer ID:</span><span>${escapeHtml(reference)}</span>
-    </div>
-  </div>
+          <p>
+            We are pleased to offer you
+            the position of
+            <strong>
+              ${escapeHtml(
+                offer.jobTitle ||
+                  offer.role ||
+                  "-"
+              )}
+            </strong>
+            at Mewar Innovators Hub.
+          </p>
 
-  <div class="footer">Together We Build a Better Tomorrow</div>
-</div>
-<script>
-window.onload=function(){setTimeout(function(){window.print()},250)};
-</script>
-</body>
-</html>`;
+          <div class="details">
+            <p>
+              <strong>Candidate:</strong>
+              ${escapeHtml(
+                offer.candidateName ||
+                  "-"
+              )}
+            </p>
+
+            <p>
+              <strong>Position:</strong>
+              ${escapeHtml(
+                offer.jobTitle ||
+                  offer.role ||
+                  "-"
+              )}
+            </p>
+
+            <p>
+              <strong>Department:</strong>
+              ${escapeHtml(
+                offer.department ||
+                  "-"
+              )}
+            </p>
+
+            <p>
+              <strong>Joining Date:</strong>
+              ${escapeHtml(
+                formatDate(
+                  offer.joiningDate
+                )
+              )}
+            </p>
+
+            <p>
+              <strong>Work Type:</strong>
+              ${escapeHtml(
+                offer.location ||
+                  offer.workType ||
+                  "-"
+              )}
+            </p>
+
+            <p>
+              <strong>Employment Type:</strong>
+              ${escapeHtml(
+                offer.employmentType ||
+                  "-"
+              )}
+            </p>
+
+            <p>
+              <strong>Compensation:</strong>
+              ${escapeHtml(
+                offer.salary ||
+                  "-"
+              )}
+            </p>
+          </div>
+
+          <p>
+            We look forward to having you
+            contribute to our team and
+            community.
+          </p>
+
+          ${
+            offer.additionalMessage
+              ? `
+                <p>
+                  <strong>
+                    Additional Terms:
+                  </strong>
+                  <br>
+                  ${escapeHtml(
+                    offer.additionalMessage
+                  )}
+                </p>
+              `
+              : ""
+          }
+
+          <div class="signature">
+            <p>
+              Regards,
+            </p>
+
+            <strong>
+              Mewar Innovators Hub
+            </strong>
+
+            <br>
+
+            Authorized Administration
+          </div>
+        </div>
+
+        <div class="footer">
+          ${escapeHtml(
+            offer.id || ""
+          )}
+          · Mewar Innovators Hub
+        </div>
+      </div>
+
+      <script>
+        window.onload = function() {
+          window.print();
+        };
+      <\/script>
+    </body>
+    </html>
+  `;
 
   printWindow.document.open();
-  printWindow.document.write(html);
+  printWindow.document.write(
+    html
+  );
   printWindow.document.close();
-}
-
-function setVerificationMessage(message, type = "") {
-  if (!verificationMessage) return;
-  verificationMessage.textContent = message || "";
-  verificationMessage.className = `form-message ${type}`.trim();
-}
-
-function renderVerificationFilePreview() {
-  if (!verificationFilePreview) return;
-  const file = verificationDocument?.files?.[0];
-
-  if (!file) {
-    verificationFilePreview.innerHTML = "";
-    return;
-  }
-
-  const sizeMb = file.size / (1024 * 1024);
-  if (sizeMb > 10) {
-    verificationFilePreview.innerHTML = `<span>File is larger than 10 MB.</span>`;
-    return;
-  }
-
-  const type = file.type || "";
-  if (type === "application/pdf") {
-    verificationFilePreview.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:10px;">
-        <i class="fa-solid fa-file-pdf"></i>
-        <span>${escapeHtml(file.name)} · ${Math.round(file.size / 1024)} KB</span>
-      </div>
-    `;
-    return;
-  }
-
-  if (type.startsWith("image/")) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      verificationFilePreview.innerHTML = `
-        <div style="padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:10px;">
-          <img src="${escapeAttribute(reader.result)}" alt="Verification Preview" style="max-width:100%;max-height:300px;display:block;margin:0 auto;border-radius:8px;object-fit:contain;">
-          <div style="margin-top:8px;text-align:center;">${escapeHtml(file.name)} · ${Math.round(file.size / 1024)} KB</div>
-        </div>
-      `;
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("Unable to read the selected file."));
-    reader.readAsDataURL(file);
-  });
-}
-
-function renderVerifications() {
-  if (!verificationGrid) return;
-
-  if (!currentVerifications.length) {
-    verificationGrid.innerHTML = '<div class="empty-state">No verification documents found.</div>';
-    return;
-  }
-
-  verificationGrid.innerHTML = currentVerifications.map(record => {
-    const document = record.document || {};
-    const documentUrl = document.data || record.documentUrl || "";
-    const documentName = document.name || record.documentName || "Official Document";
-    const isImage = String(document.type || "").startsWith("image/") || /\.(png|jpe?g)$/i.test(documentName);
-
-    return `
-      <div class="offer-card verification-card">
-        <div class="card-user">
-          <div class="card-user-avatar">
-            <i class="fa-solid ${isImage ? "fa-image" : "fa-file-pdf"}"></i>
-          </div>
-          <div>
-            <strong>${escapeHtml(record.offerId || "-")}</strong>
-            <span>${escapeHtml(record.applicationId || "-")}</span>
-          </div>
-        </div>
-
-        <div class="card-details">
-          <div>
-            <span>Verification ID</span>
-            <b>${escapeHtml(record.verificationId || record.id || "-")}</b>
-          </div>
-          <div>
-            <span>Document</span>
-            <b>${escapeHtml(documentName)}</b>
-          </div>
-          <div>
-            <span>Created</span>
-            <b>${formatDate(record.createdAt || record.submittedAt)}</b>
-          </div>
-        </div>
-
-        <div class="card-actions">
-          ${documentUrl ? `<a class="btn primary" href="${escapeAttribute(documentUrl)}" target="_blank" rel="noopener noreferrer">Open</a>` : ""}
-          <button class="btn" onclick="deleteVerification('${escapeAttribute(record.id || record.verificationId || "")}')">Delete</button>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-async function saveVerification(event) {
-  event.preventDefault();
-  setVerificationMessage("");
-
-  const offerId = document.getElementById("verificationOfferId")?.value.trim();
-  const applicationId = document.getElementById("verificationApplicationId")?.value.trim();
-  const file = verificationDocument?.files?.[0];
-
-  if (!offerId || !applicationId || !file) {
-    setVerificationMessage("Offer ID, Application ID and document are required.", "error");
-    return;
-  }
-
-  const allowedTypes = ["application/pdf", "image/png", "image/jpeg"];
-  const allowedExtensions = /\.(pdf|png|jpe?g)$/i;
-
-  if (!allowedTypes.includes(file.type) && !allowedExtensions.test(file.name)) {
-    setVerificationMessage("Only PDF, PNG, JPG or JPEG files are allowed.", "error");
-    return;
-  }
-
-  if (file.size > 10 * 1024 * 1024) {
-    setVerificationMessage("Maximum document size is 10 MB.", "error");
-    return;
-  }
-
-  const button = document.getElementById("saveVerificationBtn");
-  const originalText = button?.innerHTML || "";
-
-  if (button) {
-    button.disabled = true;
-    button.innerHTML = "Saving...";
-  }
-
-  try {
-    const dataUrl = await fileToDataUrl(file);
-    const extension = file.name.split(".").pop().toLowerCase();
-
-    const payload = {
-      offerId,
-      applicationId,
-      document: {
-        name: file.name,
-        originalName: file.name,
-        type: file.type || (extension === "pdf" ? "application/pdf" : `image/${extension === "jpg" || extension === "jpeg" ? "jpeg" : "png"}`),
-        extension,
-        size: file.size,
-        data: dataUrl
-      }
-    };
-
-    const result = await apiRequest("/admin/verification", {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
-
-    const saved = result.data || result.verification || result;
-    if (saved && (saved.id || saved.verificationId)) {
-      currentVerifications.unshift(saved);
-    } else {
-      const refreshed = await apiRequest("/admin/verification");
-      currentVerifications = Array.isArray(refreshed) ? refreshed : refreshed.items || refreshed.data || [];
-    }
-
-    verificationForm?.reset();
-    if (verificationFilePreview) verificationFilePreview.innerHTML = "";
-    setVerificationMessage("Verification document saved successfully.", "success");
-    renderVerifications();
-    showToast("Verification document saved successfully.");
-  } catch (error) {
-    setVerificationMessage(error.message || "Unable to save verification document.", "error");
-    showToast(error.message || "Unable to save verification document.", "error");
-  } finally {
-    if (button) {
-      button.disabled = false;
-      button.innerHTML = originalText;
-    }
-  }
-}
-
-async function deleteVerification(id) {
-  if (!id) return;
-  const record = currentVerifications.find(item => String(item.id || item.verificationId) === String(id));
-  if (!record) return;
-
-  if (!confirm(`Delete verification record for ${record.applicationId || "this application"}?`)) return;
-
-  try {
-    await apiRequest(`/admin/verification/${encodeURIComponent(id)}`, { method: "DELETE" });
-    currentVerifications = currentVerifications.filter(item => String(item.id || item.verificationId) !== String(id));
-    renderVerifications();
-    showToast("Verification record deleted successfully.");
-  } catch (error) {
-    showToast(error.message || "Unable to delete verification record.", "error");
-  }
 }
 
 async function deleteOffer(id) {
@@ -2617,30 +2627,6 @@ if (communityRefresh) {
   );
 }
 
-if (verificationDocument) {
-  verificationDocument.addEventListener("change", renderVerificationFilePreview);
-}
-
-if (verificationForm) {
-  verificationForm.addEventListener("submit", saveVerification);
-}
-
-if (verificationRefresh) {
-  verificationRefresh.addEventListener("click", async () => {
-    verificationRefresh.disabled = true;
-    try {
-      const data = await apiRequest("/admin/verification");
-      currentVerifications = Array.isArray(data) ? data : data.items || data.data || [];
-      renderVerifications();
-      showToast("Verification records refreshed.");
-    } catch (error) {
-      showToast(error.message || "Unable to refresh verification records.", "error");
-    } finally {
-      verificationRefresh.disabled = false;
-    }
-  });
-}
-
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -2685,9 +2671,6 @@ window.printOffer =
 
 window.deleteOffer =
   deleteOffer;
-
-window.deleteVerification =
-  deleteVerification;
 
 window.closeDrawer =
   closeDrawer;
